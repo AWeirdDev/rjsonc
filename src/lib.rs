@@ -1,22 +1,17 @@
 use anyhow::{ Context, Result };
 
-use json_comments::StripComments;
 use pyo3::{ prelude::*, types::{ PyBool, PyDict, PyFloat, PyInt, PyList, PyNone, PyString } };
 use ijson::{ IValue, ValueType };
 
 #[pyfunction]
 fn loads_str(py: Python<'_>, json: &str) -> Result<Py<PyAny>> {
-    let reader = StripComments::new(json.as_bytes());
-    let value: IValue = serde_json::from_reader(reader).context("ijson::IValue extraction")?;
-
+    let value: IValue = serde_json::from_str(json).context("ijson::IValue extraction")?;
     Ok(get_py(py, value)?)
 }
 
 #[pyfunction]
 fn loads_bytes(py: Python<'_>, json: &[u8]) -> Result<Py<PyAny>> {
-    let reader = StripComments::new(json);
-    let value: IValue = serde_json::from_reader(reader).context("ijson::IValue extraction")?;
-
+    let value: IValue = serde_json5::from_slice(json).context("ijson::IValue extraction")?;
     Ok(get_py(py, value)?)
 }
 
